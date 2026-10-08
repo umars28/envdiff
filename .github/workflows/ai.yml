@@ -33,6 +33,17 @@ jobs:
     uses: umars28/aiflow/.github/workflows/build.yml@main
     secrets: inherit
 
+  review_after_build:
+    needs: build
+    if: >-
+      always() && needs.build.result == 'success'
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    uses: umars28/aiflow/.github/workflows/review.yml@main
+    secrets: inherit
+
   nightly:
     if: github.event_name == 'workflow_dispatch'
     permissions:
