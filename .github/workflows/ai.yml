@@ -2,10 +2,7 @@ name: AI
 
 on:
   pull_request:
-    types: [opened, ready_for_review]
-  push:
-    branches-ignore: [main]
-    paths: ['specs/**', '.aiflow/02-design.md']
+    types: [opened, ready_for_review, labeled]
   workflow_dispatch:
   repository_dispatch:
     types: [ai-fix]
@@ -14,7 +11,9 @@ on:
 
 jobs:
   review:
-    if: github.event_name == 'pull_request'
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action != 'labeled'
     permissions:
       contents: read
       pull-requests: write
@@ -23,7 +22,10 @@ jobs:
     secrets: inherit
 
   build:
-    if: github.event_name == 'push'
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'ai-build'
     permissions:
       contents: write
       pull-requests: write
